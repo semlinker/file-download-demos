@@ -17,7 +17,7 @@
 1、克隆项目
 
 ```shell
-git clone https://github.com/semlinker/file-upload-demos.git
+git clone https://github.com/semlinker/file-download-demos.git
 ```
 
 2、安装依赖
