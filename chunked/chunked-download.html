@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>chunked 下载示例</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  </head>
+  <body>
+    <h3>chunked 下载示例</h3>
+    <button onclick="download()">下载</button>
+    <script>
+      const chunkedUrl = "http://localhost:3000/file?filename=file.txt";
+
+      function download() {
+        return fetch(chunkedUrl)
+          .then(processChunkedResponse)
+          .then(onChunkedResponseComplete)
+          .catch(onChunkedResponseError);
+      }
+
+      function processChunkedResponse(response) {
+        let text = "";
+        let reader = response.body.getReader();
+        let decoder = new TextDecoder();
+
+        return readChunk();
+
+        function readChunk() {
+          return reader.read().then(appendChunks);
+        }
+
+        function appendChunks(result) {
+          console.dir(result);
+          let chunk = decoder.decode(result.value || new Uint8Array(), {
+            stream: !result.done,
+          });
+          console.log("已接收到的数据：", chunk);
+          console.log("本次已成功接收", chunk.length, "bytes");
+          text += chunk;
+          console.log("目前为止共接收", text.length, "bytes\n");
+          if (result.done) {
+            return text;
+          } else {
+            return readChunk();
+          }
+        }
+      }
+
+      function onChunkedResponseComplete(result) {
+        let blob = new Blob([result], {
+          type: "text/plain;charset=utf-8",
+        });
+        saveAs(blob, "hello.txt");
+      }
+
+      function onChunkedResponseError(err) {
+        console.error(err);
+      }
+    </script>
+  </body>
+</html>

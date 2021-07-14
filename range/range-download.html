@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>范围下载示例</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  </head>
+  <body>
+    <h3>范围下载示例</h3>
+    <button onclick="download()">下载</button>
+    <script>
+      async function download() {
+        try {
+          let rangeContent = await getBinaryContent(
+            "http://localhost:3000/range/file.txt",
+            0,
+            100,
+            "text"
+          );
+          const blob = new Blob([rangeContent], {
+            type: "text/plain;charset=utf-8",
+          });
+          saveAs(blob, "hello.txt");
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      function getBinaryContent(url, start, end, responseType = "arraybuffer") {
+        return new Promise((resolve, reject) => {
+          try {
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.setRequestHeader("range", `bytes=${start}-${end}`);
+            xhr.responseType = responseType;
+            xhr.onload = function () {
+              resolve(xhr.response);
+            };
+            xhr.send();
+          } catch (err) {
+            reject(new Error(err));
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

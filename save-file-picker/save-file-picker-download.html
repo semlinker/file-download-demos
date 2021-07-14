@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>showSaveFilePicker 下载示例</title>
+    <script src="https://unpkg.com/merge-images"></script>
+  </head>
+  <body>
+    <h3>showSaveFilePicker 标签下载示例</h3>
+    <div>
+      <img src="../images/body.png" />
+      <img src="../images/eyes.png" />
+      <img src="../images/mouth.png" />
+    </div>
+    <img id="mergedPic" src="http://via.placeholder.com/256" />
+    <button onclick="merge()">图片合成</button>
+    <button onclick="download()">图片下载</button>
+    <script>
+      const mergePicEle = document.querySelector("#mergedPic");
+      const images = ["/body.png", "/eyes.png", "/mouth.png"].map(
+        (path) => "../images" + path
+      );
+      let imgDataUrl = null;
+
+      async function merge() {
+        imgDataUrl = await mergeImages(images);
+        mergePicEle.src = imgDataUrl;
+      }
+
+      async function download() {
+        if (!imgDataUrl) {
+          alert("请先合成图片");
+          return;
+        }
+        const imgBlob = dataUrlToBlob(imgDataUrl, "image/png");
+        await saveFile(imgBlob, "face");
+        alert("图片下载成功");
+      }
+
+      function dataUrlToBlob(base64, mimeType) {
+        let bytes = window.atob(base64.split(",")[1]);
+        let ab = new ArrayBuffer(bytes.length);
+        let ia = new Uint8Array(ab);
+        for (let i = 0; i < bytes.length; i++) {
+          ia[i] = bytes.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeType });
+      }
+
+      async function saveFile(blob, filename) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: filename,
+            types: [
+              {
+                description: "PNG file",
+                accept: {
+                  "image/png": [".png"],
+                },
+              },
+              {
+                description: "Jpeg file",
+                accept: {
+                  "image/jpeg": [".jpeg"],
+                },
+              },
+            ],
+          });
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          return handle;
+        } catch (err) {
+          console.error(err.name, err.message);
+        }
+      }
+    </script>
+  </body>
+</html>

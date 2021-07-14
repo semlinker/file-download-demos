@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>base64 下载示例</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  </head>
+  <body>
+    <h3>base64 下载示例</h3>
+    <img id="imgPreview" src="./static/body.png" />
+    <select id="picSelect">
+      <option value="body">body.png</option>
+      <option value="eyes">eyes.png</option>
+      <option value="mouth">mouth.png</option>
+    </select>
+    <button onclick="download()">下载</button>
+    <script>
+      const picSelectEle = document.querySelector("#picSelect");
+      const imgPreviewEle = document.querySelector("#imgPreview");
+      picSelectEle.addEventListener("change", (event) => {
+        imgPreviewEle.src = "./static/" + picSelectEle.value + ".png";
+      });
+      const request = axios.create({
+        baseURL: "http://localhost:3000",
+        timeout: 60000,
+      });
+
+      async function download() {
+        const response = await request.get("/file", {
+          params: {
+            filename: picSelectEle.value + ".png",
+          },
+        });
+        if (response && response.data && response.data.code === 1) {
+          const fileData = response.data.data;
+          const { name, type, content } = fileData;
+          const imgBlob = base64ToBlob(content, type);
+          saveAs(imgBlob, name);
+        }
+      }
+
+      function base64ToBlob(base64, mimeType) {
+        let bytes = window.atob(base64);
+        let ab = new ArrayBuffer(bytes.length);
+        let ia = new Uint8Array(ab);
+        for (let i = 0; i < bytes.length; i++) {
+          ia[i] = bytes.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeType });
+      }
+    </script>
+  </body>
+</html>

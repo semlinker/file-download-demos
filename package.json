@@ -1,0 +1,41 @@
+{
+  "name": "file-download-demos",
+  "version": "1.0.0",
+  "description": "Multi-scene File Download Demo",
+  "main": "index.js",
+  "scripts": {
+    "server": "lite-server",
+    "atag": "concurrently \"npm run server\" \"(npm run delay && open http://localhost:3000/a-tag/a-tag-download.html)\"",
+    "attachment": "concurrently \"node ./attachment/file-server.js\" \"(npm run delay && open http://localhost:3000/file?filename=body.png)\"",
+    "base64": "concurrently \"node ./base64/file-server.js\" \"open ./base64/base64-download.html\"",
+    "big": "concurrently \"npm run server\" \"(npm run delay && open http://localhost:3000/big-file/big-file-download.html)\"",
+    "chunked": "concurrently \"node ./chunked/http-stream-server.js\" \"open ./chunked/chunked-download.html\"",
+    "picker": "concurrently \"npm run server\" \"(npm run delay && open http://localhost:3000/save-file-picker/save-file-picker-download.html)\"",
+    "range": "concurrently \"node ./range/koa-range-server.js\" \"open ./range/range-download.html\"",
+    "saver": "concurrently \"npm run server\" \"(npm run delay && open http://localhost:3000/file-saver/file-saver-download.html)\"",
+    "zip": "concurrently \"npm run server\" \"(npm run delay && open http://localhost:3000/jszip/zip-download.html)\"",
+    "delay": "node ./node_modules/npm-delay 2000"
+  },
+  "keywords": [
+    "download",
+    "file download",
+    "chunked download",
+    "big file download"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^6.2.0",
+    "lite-server": "^2.6.1",
+    "npm-delay": "^1.0.4",
+    "open": "^8.2.1"
+  },
+  "dependencies": {
+    "@koa/cors": "^3.1.0",
+    "@koa/router": "^10.0.0",
+    "koa": "^2.13.1",
+    "koa-range": "^0.3.0",
+    "koa-static": "^5.0.0",
+    "mime": "^2.5.2"
+  }
+}

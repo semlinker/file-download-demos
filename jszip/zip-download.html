@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zip 下载示例</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  </head>
+  <body>
+    <h3>Zip 下载示例</h3>
+    <div>
+      <img src="../images/body.png" />
+      <img src="../images/eyes.png" />
+      <img src="../images/mouth.png" />
+    </div>
+    <button onclick="download()">打包下载</button>
+    <script>
+      const images = ["body.png", "eyes.png", "mouth.png"];
+      const imageUrls = images.map((name) => "../images/" + name);
+
+      async function download() {
+        let zip = new JSZip();
+        Promise.all(imageUrls.map(getFileContent)).then((contents) => {
+          contents.forEach((content, i) => {
+            zip.file(images[i], content);
+          });
+          zip.generateAsync({ type: "blob" }).then(function (blob) {
+            saveAs(blob, "material.zip");
+          });
+        });
+      }
+
+      function getFileContent(fileUrl) {
+        return new JSZip.external.Promise(function (resolve, reject) {
+          JSZipUtils.getBinaryContent(fileUrl, function (err, data) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(data);
+            }
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
